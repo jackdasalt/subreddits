@@ -1,76 +1,88 @@
 <!doctype html>
 <html lang="en-GB">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="A static Reddit digest dashboard for top posts, comments, summaries and media." />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="colour-scheme" content="light dark">
   <title>Reddit Digest</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://www.redditstatic.com">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="site-header">
     <div>
       <p class="eyebrow">24-hour subreddit briefing</p>
       <h1>Reddit Digest</h1>
-      <p class="lede">Top non-duplicate stories, key comments and embedded media without opening Reddit.</p>
+      <p class="lede">A static briefing built from r/top/day or r/hot, with media and comments displayed inside this app.</p>
     </div>
     <div class="header-actions">
-      <button id="refreshButton" class="primary">Refresh digest</button>
-      <button id="settingsButton" class="secondary" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
+      <button id="refreshButton" class="button primary">Reload digest</button>
+      <button id="settingsButton" class="button">Settings</button>
     </div>
   </header>
 
-  <section id="settingsPanel" class="settings-panel hidden" aria-label="Settings">
-    <label>
-      Subreddits
-      <textarea id="subredditInput" rows="4" spellcheck="false"></textarea>
-    </label>
-    <div class="settings-grid">
-      <label>Posts per subreddit <input id="postLimitInput" type="number" min="5" max="100" /></label>
-      <label>Top comments per post <input id="commentLimitInput" type="number" min="3" max="50" /></label>
-      <label>Digest cards <input id="maxPostsInput" type="number" min="3" max="40" /></label>
-      <label>Duplicate threshold <input id="dupeThresholdInput" type="number" min="0.2" max="0.95" step="0.01" /></label>
-    </div>
-    <label>
-      Optional CORS proxy prefix
-      <input id="proxyInput" type="url" placeholder="https://your-proxy.example/?url=" />
-      <span class="hint">Leave blank first. Use only a proxy you control or trust.</span>
-    </label>
-    <button id="saveSettingsButton" class="primary">Save settings</button>
-  </section>
-
-  <main>
-    <section class="summary-card">
+  <main class="layout">
+    <section id="settingsPanel" class="panel settings-panel hidden" aria-live="polite">
       <div>
-        <p class="eyebrow">Overview</p>
-        <h2 id="overviewTitle">Loading latest posts…</h2>
+        <p class="eyebrow">Configuration</p>
+        <h2>Edit subreddits in <code>subreddits.json</code></h2>
+        <p>This GitHub Pages version does not fetch Reddit from your visitor’s browser. GitHub Actions builds <code>data/digest.json</code>, then the site reads that file. That avoids CORS failures.</p>
       </div>
-      <p id="overviewText" class="overview-text">Fetching configured subreddits.</p>
-      <div id="statusBar" class="status-bar" role="status"></div>
+      <div class="settings-grid">
+        <label>Current subreddits<textarea id="subredditList" rows="6" readonly></textarea></label>
+        <label>Data source<input id="sourceField" readonly></label>
+        <label>Generated<input id="generatedField" readonly></label>
+      </div>
+      <details>
+        <summary>How to change the tracked communities</summary>
+        <ol>
+          <li>Open <code>subreddits.json</code> in your GitHub repository.</li>
+          <li>Add or remove subreddit names in the <code>subreddits</code> array.</li>
+          <li>Commit the change.</li>
+          <li>Run the <strong>Build Reddit Digest</strong> workflow, or wait for the next scheduled run.</li>
+        </ol>
+      </details>
     </section>
 
+    <section class="overview-card panel">
+      <div class="overview-copy">
+        <p class="eyebrow">Overview</p>
+        <h2 id="overviewTitle">Loading digest…</h2>
+        <p id="overviewText">Reading local digest data.</p>
+        <ul id="overviewBullets" class="summary-list"></ul>
+      </div>
+      <div id="themeCloud" class="theme-cloud"></div>
+    </section>
+
+    <section id="statusBar" class="status-bar" aria-live="polite"></section>
     <section id="subredditTabs" class="tabs" aria-label="Subreddit filters"></section>
-    <section id="digestGrid" class="digest-grid" aria-live="polite"></section>
+    <section id="digestGrid" class="digest-grid"></section>
   </main>
 
   <template id="postCardTemplate">
-    <article class="post-card">
-      <div class="post-topline">
+    <article class="post-card panel">
+      <div class="post-meta">
         <span class="subreddit"></span>
-        <span class="score"></span>
-        <span class="comment-count"></span>
+        <span class="flair"></span>
+        <span class="age"></span>
       </div>
       <h3></h3>
       <p class="post-summary"></p>
+      <div class="metrics">
+        <span class="score"></span>
+        <span class="comment-count"></span>
+        <span class="ratio"></span>
+        <span class="domain"></span>
+      </div>
       <div class="media-slot"></div>
-      <div class="post-actions">
-        <button class="comments-button secondary">Show top comments</button>
-        <a class="source-link" target="_blank" rel="noopener noreferrer">Permalink</a>
+      <div class="card-actions">
+        <button class="button comments-button">Show top comments</button>
+        <a class="button ghost source-link" target="_blank" rel="noreferrer">Open original</a>
       </div>
       <section class="comments hidden"></section>
     </article>
   </template>
 
-  <script src="app.js" type="module"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>

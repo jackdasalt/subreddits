@@ -10,12 +10,18 @@
     "mcfc"
   ],
   "settings": {
+    "listing": "top",
+    "timeFilter": "day",
+    "includeHotFallback": true,
     "postLimitPerSubreddit": 35,
-    "commentLimitPerPost": 18,
-    "maxPostsShown": 10,
-    "duplicateSimilarityThreshold": 0.62,
-    "redditJsonBaseUrl": "https://www.reddit.com",
-    "corsProxyPrefix": "",
-    "requestDelayMs": 450
+    "commentLimitPerPost": 10,
+    "replyDepth": 2,
+    "maxPostsShown": 28,
+    "duplicateSimilarityThreshold": 0.48,
+    "requestDelayMs": 850,
+    "minimumScore": 10,
+    "minimumComments": 3,
+    "hideNsfw": true,
+    "userAgent": "reddit-digest-github-pages/2.0"
   }
 }
