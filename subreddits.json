@@ -1,0 +1,21 @@
+{
+  "subreddits": [
+    "tennis",
+    "soccer",
+    "chess",
+    "formula1",
+    "coys",
+    "chelseafc",
+    "reddevils",
+    "mcfc"
+  ],
+  "settings": {
+    "postLimitPerSubreddit": 35,
+    "commentLimitPerPost": 18,
+    "maxPostsShown": 10,
+    "duplicateSimilarityThreshold": 0.62,
+    "redditJsonBaseUrl": "https://www.reddit.com",
+    "corsProxyPrefix": "",
+    "requestDelayMs": 450
+  }
+}
