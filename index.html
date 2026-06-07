@@ -3,83 +3,126 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="colour-scheme" content="light dark">
-  <title>Reddit Digest</title>
-  <link rel="preconnect" href="https://www.redditstatic.com">
+  <meta name="description" content="A concise, deduplicated briefing from selected Reddit communities.">
+  <meta name="theme-color" content="#f4efe6">
+  <title>Reddit Briefing</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <div>
-      <p class="eyebrow">24-hour subreddit briefing</p>
-      <h1>Reddit Digest</h1>
-      <p class="lede">A static briefing built from r/top/day or r/hot, with media and comments displayed inside this app.</p>
-    </div>
-    <div class="header-actions">
-      <button id="refreshButton" class="button primary">Reload digest</button>
-      <button id="settingsButton" class="button">Settings</button>
-    </div>
-  </header>
-
-  <main class="layout">
-    <section id="settingsPanel" class="panel settings-panel hidden" aria-live="polite">
+  <div class="page-shell">
+    <header class="masthead">
       <div>
-        <p class="eyebrow">Configuration</p>
-        <h2>Edit subreddits in <code>subreddits.json</code></h2>
-        <p>This GitHub Pages version does not fetch Reddit from your visitor’s browser. GitHub Actions builds <code>data/digest.json</code>, then the site reads that file. That avoids CORS failures.</p>
+        <p class="eyebrow">24-hour community briefing</p>
+        <h1>Reddit Briefing</h1>
+        <p class="lede">The important stories, stripped of duplicates and endless scrolling.</p>
       </div>
-      <div class="settings-grid">
-        <label>Current subreddits<textarea id="subredditList" rows="6" readonly></textarea></label>
-        <label>Data source<input id="sourceField" readonly></label>
-        <label>Generated<input id="generatedField" readonly></label>
+      <div class="masthead-actions">
+        <button class="button button-dark" id="refreshButton" type="button">Refresh briefing</button>
+        <button class="button button-light" id="settingsButton" type="button">Settings</button>
       </div>
-      <details>
-        <summary>How to change the tracked communities</summary>
-        <ol>
-          <li>Open <code>subreddits.json</code> in your GitHub repository.</li>
-          <li>Add or remove subreddit names in the <code>subreddits</code> array.</li>
-          <li>Commit the change.</li>
-          <li>Run the <strong>Build Reddit Digest</strong> workflow, or wait for the next scheduled run.</li>
-        </ol>
-      </details>
-    </section>
+    </header>
 
-    <section class="overview-card panel">
-      <div class="overview-copy">
-        <p class="eyebrow">Overview</p>
-        <h2 id="overviewTitle">Loading digest…</h2>
-        <p id="overviewText">Reading local digest data.</p>
-        <ul id="overviewBullets" class="summary-list"></ul>
-      </div>
-      <div id="themeCloud" class="theme-cloud"></div>
-    </section>
+    <main>
+      <section class="status-line" aria-live="polite">
+        <div>
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Preparing briefing…</span>
+        </div>
+        <span id="updatedText"></span>
+      </section>
 
-    <section id="statusBar" class="status-bar" aria-live="polite"></section>
-    <section id="subredditTabs" class="tabs" aria-label="Subreddit filters"></section>
-    <section id="digestGrid" class="digest-grid"></section>
-  </main>
+      <section class="hero-summary" id="heroSummary" aria-labelledby="overviewTitle">
+        <p class="section-kicker">Overview</p>
+        <h2 id="overviewTitle">Building today’s briefing…</h2>
+        <div class="overview-copy" id="overviewCopy">
+          <p>Collecting the strongest posts from your selected communities.</p>
+        </div>
+      </section>
 
-  <template id="postCardTemplate">
-    <article class="post-card panel">
-      <div class="post-meta">
-        <span class="subreddit"></span>
-        <span class="flair"></span>
-        <span class="age"></span>
+      <section class="controls" aria-label="Briefing controls">
+        <div class="segmented" role="group" aria-label="Ranking mode">
+          <button type="button" class="segment is-active" data-sort="top">Top · 24 hours</button>
+          <button type="button" class="segment" data-sort="hot">Hot now</button>
+        </div>
+        <div class="filter-row" id="subredditFilters" aria-label="Filter by community"></div>
+      </section>
+
+      <section class="briefing-grid" id="briefingGrid" aria-live="polite"></section>
+
+      <section class="empty-state" id="emptyState" hidden>
+        <p class="section-kicker">Nothing to show</p>
+        <h2>The briefing could not be loaded.</h2>
+        <p id="emptyMessage">Check your connection or configure the optional proxy in Settings.</p>
+        <button class="button button-dark" id="emptySettingsButton" type="button">Open settings</button>
+      </section>
+    </main>
+
+    <footer>
+      <p>Public Reddit listings are used for the briefing. No Reddit sign-in is required.</p>
+    </footer>
+  </div>
+
+  <dialog class="modal" id="settingsDialog">
+    <form method="dialog" class="modal-card" id="settingsForm">
+      <div class="modal-heading">
+        <div>
+          <p class="section-kicker">Settings</p>
+          <h2>Data access</h2>
+        </div>
+        <button class="icon-button" type="submit" value="cancel" aria-label="Close settings">×</button>
       </div>
-      <h3></h3>
-      <p class="post-summary"></p>
-      <div class="metrics">
-        <span class="score"></span>
-        <span class="comment-count"></span>
-        <span class="ratio"></span>
-        <span class="domain"></span>
+
+      <p class="modal-help">
+        The main briefing is generated by the included GitHub Actions workflow. Add the optional Cloudflare Worker URL only for live refreshes and in-app comments.
+      </p>
+
+      <label class="field">
+        <span>Optional live-access Worker URL</span>
+        <input id="apiBaseInput" type="url" inputmode="url" placeholder="https://reddit-briefing.your-name.workers.dev">
+        <small>Leave blank to use the direct public feed.</small>
+      </label>
+
+      <label class="field">
+        <span>Maximum stories per community</span>
+        <select id="postsPerSubInput">
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+
+      <label class="check-row">
+        <input id="showMediaInput" type="checkbox">
+        <span>Show images and videos in story cards</span>
+      </label>
+
+      <div class="modal-actions">
+        <button class="button button-light" type="submit" value="cancel">Cancel</button>
+        <button class="button button-dark" id="saveSettingsButton" type="button">Save and reload</button>
       </div>
-      <div class="media-slot"></div>
-      <div class="card-actions">
-        <button class="button comments-button">Show top comments</button>
-        <a class="button ghost source-link" target="_blank" rel="noreferrer">Open original</a>
+    </form>
+  </dialog>
+
+  <dialog class="modal details-modal" id="detailsDialog">
+    <article class="modal-card details-card">
+      <div class="modal-heading">
+        <div>
+          <p class="section-kicker" id="detailsCommunity">Details</p>
+          <h2 id="detailsTitle">Story details</h2>
+        </div>
+        <button class="icon-button" id="closeDetailsButton" type="button" aria-label="Close story details">×</button>
       </div>
-      <section class="comments hidden"></section>
+      <div id="detailsBody"></div>
+    </article>
+  </dialog>
+
+  <template id="skeletonTemplate">
+    <article class="story-card skeleton-card" aria-hidden="true">
+      <div class="skeleton skeleton-short"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line"></div>
     </article>
   </template>
 

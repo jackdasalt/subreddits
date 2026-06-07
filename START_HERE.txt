@@ -1,0 +1,14 @@
+REDDIT BRIEFING — QUICK DEPLOY
+
+1. Create a GitHub repository.
+2. Upload every file and folder from this package, including the hidden .github folder.
+3. In the repository, open Settings > Pages.
+4. Set Source to GitHub Actions.
+5. Open Actions > Build and deploy Reddit briefing > Run workflow.
+6. When the run finishes, open the Pages URL shown by the deployment step.
+
+The main summary is generated during deployment and refreshed hourly. It does not
+need a Reddit API key or the optional Cloudflare Worker.
+
+Edit subreddits.json to add or remove communities.
+See README.md for the optional live-refresh/comments Worker and troubleshooting.

@@ -1,27 +1,13 @@
 {
+  "postsPerSubreddit": 5,
   "subreddits": [
-    "tennis",
-    "soccer",
-    "chess",
-    "formula1",
-    "coys",
-    "chelseafc",
-    "reddevils",
-    "mcfc"
-  ],
-  "settings": {
-    "listing": "top",
-    "timeFilter": "day",
-    "includeHotFallback": true,
-    "postLimitPerSubreddit": 35,
-    "commentLimitPerPost": 10,
-    "replyDepth": 2,
-    "maxPostsShown": 28,
-    "duplicateSimilarityThreshold": 0.48,
-    "requestDelayMs": 850,
-    "minimumScore": 10,
-    "minimumComments": 3,
-    "hideNsfw": true,
-    "userAgent": "reddit-digest-github-pages/2.0"
-  }
+    { "name": "tennis", "label": "Tennis" },
+    { "name": "soccer", "label": "Football" },
+    { "name": "chess", "label": "Chess" },
+    { "name": "formula1", "label": "Formula 1" },
+    { "name": "coys", "label": "Spurs" },
+    { "name": "chelseafc", "label": "Chelsea" },
+    { "name": "reddevils", "label": "Manchester United" },
+    { "name": "mcfc", "label": "Manchester City" }
+  ]
 }

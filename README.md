@@ -1,67 +1,177 @@
-# Reddit Digest
+# Reddit Briefing
 
-A GitHub Pages-friendly subreddit briefing app.
+A GitHub Pages news briefing built from public Reddit `/top?t=day` and `/hot` listings.
 
-This version fixes the browser-side Reddit fetching problem: the web page does **not** fetch Reddit directly. A GitHub Action fetches `/top.json?t=day` server-side, captures top comments/replies and media metadata, writes `data/digest.json`, and the static site reads that local file.
+The deployed site shows a concise overview first, then distinct story cards. It removes duplicate URLs and substantially similar headlines, ranks posts by engagement and freshness, and supports images, Reddit video, galleries and YouTube embeds. Details can load top comments when live access is available.
 
-## What it does
+## Why this version is reliable
 
-- Tracks the subreddits listed in `subreddits.json`.
-- Uses `top/day` by default, with an optional `hot` fallback.
-- Filters to posts created in the past 24 hours.
-- Ranks by score, comment count, upvote ratio and freshness.
-- Removes near-duplicate stories by comparing titles and URLs.
-- Saves top comments and nested replies into the digest file.
-- Displays Reddit-hosted videos, GIF-style videos, images, galleries, previews and supported oEmbed embeds inside the app.
-- Runs as a static site on GitHub Pages.
+The important summary does **not** depend on the visitor's browser contacting Reddit.
 
-## Quick GitHub Pages deployment
+A GitHub Actions workflow fetches the public listings, builds `data/digest.json`, and deploys the complete site to GitHub Pages. The workflow runs:
 
-1. Create a new GitHub repository.
-2. Upload every file and folder from this project to the repository root.
-3. Go to **Settings → Actions → General → Workflow permissions**.
-4. Select **Read and write permissions**, then save.
-5. Go to **Settings → Pages**.
-6. Under **Build and deployment**, choose **Deploy from a branch**.
-7. Select your default branch, usually `main`, and `/root`, then save.
-8. Go to **Actions → Build Reddit Digest → Run workflow**.
-9. Wait for the workflow to finish, then open your GitHub Pages URL.
+- whenever you push changes;
+- when you run it manually;
+- once per hour.
 
-The workflow also runs every two hours. You can change the schedule in `.github/workflows/build-digest.yml`.
+If a scheduled fetch fails, the workflow does not replace the last successful Pages deployment with an empty page.
 
-## Changing subreddits
+The included Cloudflare Worker is optional. It enables live refreshes and comments where direct browser access is blocked, but it is not required for the main briefing.
+
+---
+
+# Deploy to GitHub Pages
+
+## 1. Create the repository
+
+Create a new GitHub repository and upload **all files and folders from this project** to its root. Make sure the hidden `.github` folder is included.
+
+The repository should contain, amongst other files:
+
+```text
+.github/workflows/deploy-pages.yml
+scripts/build_digest.py
+index.html
+app.js
+styles.css
+subreddits.json
+```
+
+## 2. Select GitHub Actions as the Pages source
+
+Open the repository and go to:
+
+```text
+Settings → Pages → Build and deployment → Source → GitHub Actions
+```
+
+Do not select “Deploy from a branch”; this project uses the included workflow.
+
+## 3. Run the workflow
+
+Uploading the files to `main` normally starts it automatically. You can also open:
+
+```text
+Actions → Build and deploy Reddit briefing → Run workflow
+```
+
+When the workflow finishes, its deployment step displays the Pages URL.
+
+That is enough for the main summary site. No Reddit account, API key, OAuth secret or external database is required.
+
+---
+
+# Change the subreddits
 
 Edit `subreddits.json`:
 
 ```json
 {
-  "subreddits": ["tennis", "soccer", "chess", "formula1"],
-  "settings": {
-    "listing": "top",
-    "timeFilter": "day"
-  }
+  "postsPerSubreddit": 5,
+  "subreddits": [
+    { "name": "tennis", "label": "Tennis" },
+    { "name": "soccer", "label": "Football" },
+    { "name": "chess", "label": "Chess" }
+  ]
 }
 ```
 
-Use names without `r/`, though the script also cleans `r/example` if you enter it.
+Use the subreddit name without `r/`. The `label` is the text shown in the filter bar.
 
-## Recommended: add Reddit OAuth secrets
+The supplied configuration contains:
 
-The app can run without secrets via Reddit’s public `.json` pages. For better reliability, create a Reddit app and add these GitHub repository secrets:
+- `r/tennis`
+- `r/soccer`
+- `r/chess`
+- `r/formula1`
+- `r/coys`
+- `r/chelseafc`
+- `r/reddevils`
+- `r/mcfc`
 
-- `REDDIT_CLIENT_ID`
-- `REDDIT_CLIENT_SECRET`
-- `REDDIT_USER_AGENT`, for example `web:reddit-digest:v2.0 by u_yourname`
+Committing a change starts a fresh build and deployment.
 
-Then rerun the workflow. The builder automatically uses OAuth when the secrets exist and falls back to public JSON if they do not.
+---
 
-## Local testing
+# What the summary does
 
-Requires Node 20 or newer.
+For both the top-day and hot views, the app:
+
+1. reads the latest generated listing data;
+2. removes stickied and repetitive daily discussion threads;
+3. ranks posts using score, comments, age and upvote ratio;
+4. removes exact-link duplicates;
+5. removes headlines with substantial word overlap;
+6. keeps the configured number of stories per community;
+7. builds the large overview from the strongest distinct stories.
+
+Self-post text is used as the card summary when available. Link and media posts are presented as a headline briefing with engagement context. The app does not fabricate facts or send content to an external AI service.
+
+---
+
+# Optional: live refreshes and comments
+
+The static briefing works without this section. Deploy the Worker only if you want the **Refresh briefing** button and comment panel to fetch Reddit live from every visitor's browser session.
+
+## Deploy with the Cloudflare dashboard
+
+1. Create or sign in to a free Cloudflare account.
+2. Open **Workers & Pages**.
+3. Select **Create → Worker → Deploy**.
+4. Open the Worker and choose **Edit code**.
+5. Replace the sample with the entire contents of `worker/worker.js`.
+6. Deploy it.
+7. Copy the resulting URL, for example:
+
+```text
+https://reddit-briefing-proxy.your-name.workers.dev
+```
+
+8. Put it in `deployment.json`:
+
+```json
+{
+  "apiBase": "https://reddit-briefing-proxy.your-name.workers.dev",
+  "postsPerSubreddit": 5,
+  "showMedia": true
+}
+```
+
+9. Commit the change. The Pages workflow redeploys the site.
+
+Test the Worker with:
+
+```text
+https://YOUR-WORKER.workers.dev/health
+```
+
+It should return JSON containing `"ok": true`.
+
+Test a listing with:
+
+```text
+https://YOUR-WORKER.workers.dev/listing?subreddit=tennis&sort=top&t=day&limit=5
+```
+
+## Deploy with the command line
+
+From the `worker` folder:
 
 ```bash
-npm run build
-npm run serve
+npm install
+npm run deploy
+```
+
+Copy the deployed URL into `deployment.json` and commit it.
+
+---
+
+# Run locally
+
+Run a local web server from the project folder:
+
+```bash
+python3 -m http.server 8080
 ```
 
 Then open:
@@ -70,21 +180,58 @@ Then open:
 http://localhost:8080
 ```
 
-## Important limitations
+The placeholder `data/digest.json` is empty until the build script runs. To generate live data locally:
 
-- This is not a real-time Reddit client. It updates when the GitHub Action runs.
-- Some third-party media providers block embedding. When that happens, the app shows the available preview or fallback media instead.
-- Reddit-hosted video `fallback_url` sometimes lacks audio because Reddit may store video and audio separately.
-- The summaries are extractive/rule-based. For genuine AI summaries, add a server-side summarisation step to `scripts/build-digest.mjs` using your preferred model API key.
-
-## File map
-
-```text
-index.html                       Static app shell
-styles.css                       Design system and layout
-app.js                           Front-end renderer for data/digest.json
-subreddits.json                  Editable subreddit/settings config
-data/digest.json                 Generated digest consumed by the web app
-scripts/build-digest.mjs         Server-side Reddit fetcher/summariser
-.github/workflows/build-digest.yml Scheduled/manual GitHub Action
+```bash
+python3 scripts/build_digest.py
 ```
+
+Then refresh the local page.
+
+To run the optional Worker locally:
+
+```bash
+cd worker
+npm install
+npm run dev
+```
+
+Put the local Worker URL printed by Wrangler into `deployment.json`.
+
+---
+
+# Media support
+
+The app embeds:
+
+- Reddit-hosted images;
+- Reddit-hosted video fallback files;
+- Reddit galleries;
+- YouTube videos;
+- Reddit preview images for many external links.
+
+Some publishers prohibit embedding. Those cards retain an **Open source** button.
+
+---
+
+# Troubleshooting
+
+## The Pages URL does not exist
+
+Open the Actions tab and confirm the workflow completed. Also confirm Pages is set to **GitHub Actions**, not **Deploy from a branch**.
+
+## The workflow fails while fetching Reddit
+
+Open the failed `Fetch public Reddit listings` step. The builder tries several JSON URLs and an Atom/RSS fallback. Re-run the workflow once; a temporary upstream block should not overwrite an existing successful deployment.
+
+## The site says the published data file is empty
+
+The placeholder file was deployed instead of the generated one. Confirm the included workflow is being used and that its `Fetch public Reddit listings` step succeeded.
+
+## A particular subreddit is missing
+
+Check the spelling in `subreddits.json`. Names may contain letters, digits and underscores and should not include `r/`.
+
+## Live refresh fails but the briefing remains visible
+
+That is expected when the optional Worker has not been configured and the browser blocks direct Reddit access. The hourly published briefing remains available.
