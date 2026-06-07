@@ -1,37 +1,32 @@
 <!doctype html>
 <html lang="en-GB">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Reddit Briefing</title>
-    <link rel="stylesheet" href="styles.css"/>
-  </head>
-  <body>
-    <header class="hero">
-      <div class="hero-inner">
-        <h1 class="brand">Reddit Briefing</h1>
-        <p class="tagline">Top stories by subreddit. Concise summaries. Minimal scrolling.</p>
-        <div id="status" class="status" aria-live="polite">Loading…</div>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Reddit Briefing</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <div class="masthead-top">
+        <div class="nameplate">Reddit Briefing</div>
+        <div class="dateline" id="dateline"></div>
       </div>
-    </header>
+      <p class="strapline">A daily briefing of what mattered across your chosen subreddits.</p>
+    </div>
+  </header>
 
-    <main id="main" class="container">
-      <section class="summary-note">
-        <p>
-          This is a reader-style digest generated from the top posts over the last 24 hours.
-          It is meant to be read as a briefing: a few short paragraphs per subreddit, followed by optional detail.
-        </p>
-      </section>
+  <main class="wrap">
+    <div class="lede" id="status" aria-live="polite">Loading…</div>
 
-      <section class="subs" id="subs"></section>
-    </main>
+    <section id="subs" class="subs"></section>
+  </main>
 
-    <footer class="footer container">
-      <div class="foot-inner">
-        <div id="footerMeta"></div>
-      </div>
-    </footer>
+  <footer class="wrap footer">
+    <div id="footerMeta" class="footer-meta"></div>
+  </footer>
 
-    <script type="module" src="app.js"></script>
-  </body>
+  <script type="module" src="app.js"></script>
+</body>
 </html>
