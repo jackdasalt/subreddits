@@ -1,104 +1,164 @@
 
 :root{
-  --bg:#fff;
-  --text:#111;
-  --muted:#4b5563;
-  --stroke:#e5e7eb;
-  --card:#fff;
-  --shadow: 0 10px 30px rgba(15,23,42,.08);
-  --accent:#2563eb;
+  --bg: #f8f8fa;
+  --paper: #ffffff;
+  --ink: #131315;
+  --muted: #565a65;
+  --rule: rgba(19, 19, 21, 0.12);
+  --accent: #0030b8;
+  --shadow: 0 10px 28px rgba(22, 26, 36, .12);
 }
 
-*{ box-sizing:border-box; }
-html, body{ height:100%; }
+html, body { height: 100%; }
 body{
-  margin:0;
-  background: radial-gradient(900px 400px at 80% 0%, rgba(37,99,235,.12), transparent), var(--bg);
-  color: var(--text);
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 .hero{
-  border-bottom: 1px solid var(--stroke);
-  background: linear-gradient(180deg, rgba(37,99,235,.08), transparent);
+  background: linear-gradient(180deg, #ffffff, #f3f5fc);
+  border-bottom: 1px solid var(--rule);
 }
-.hero__inner{
-  max-width: 960px;
+.hero-inner{
+  width: min(1100px, 92vw);
   margin: 0 auto;
-  padding: 22px 18px;
+  padding: 22px 0 16px;
 }
-.hero h1{
-  margin: 0 0 6px;
-  letter-spacing: .2px;
-}
-.hero__subtitle{
+.brand{
   margin: 0;
+  font-family: ui-serif, "Georgia", serif;
+  letter-spacing: 0.2px;
+}
+.tagline{
+  margin: 6px 0 10px;
   color: var(--muted);
 }
 .status{
-  margin-top: 10px;
   color: var(--accent);
-  font-weight: 600;
+  font-size: 13px;
 }
 
-.layout{
-  max-width: 960px;
+.container{
+  width: min(1100px, 92vw);
   margin: 0 auto;
-  padding: 18px;
-}
-.layout h2{
-  margin: 18px 0 10px;
 }
 
-.cards{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.card{
-  border:1px solid var(--stroke);
+.summary-note{
+  background: var(--paper);
+  border: 1px solid var(--rule);
   border-radius: 14px;
-  padding: 14px 14px 12px;
+  padding: 14px 18px;
+  margin: 14px 0 18px;
+}
+
+.subs{
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sub-card{
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 18px 18px 14px;
   box-shadow: var(--shadow);
-  background: var(--card);
 }
-.card h3{
-  margin: 0 0 8px;
+
+.sub-head{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 8px;
 }
+.sub-title{
+  margin: 0;
+  font-family: ui-serif, "Georgia", serif;
+  font-size: 22px;
+}
+.sub-meta{
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .briefing{
   margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.65;
+  font-size: 15px;
 }
+
 .headlines{
   margin-top: 10px;
-  padding: 10px 10px 10px 14px;
-  border: 1px solid var(--stroke);
-  border-radius: 10px;
-  background: #f9fafb;
+  padding-left: 18px;
+  color: var(--muted);
 }
 .headlines li{
-  margin: 6px 0;
+  margin: 3px 0;
+}
+
+.actions{
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn{
+  border: 1px solid rgba(19, 19, 21, 0.28);
+  background: #f7f8ff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 7px 10px;
+  cursor: pointer;
   font-size: 13px;
 }
-
-.panel{
-  margin-top: 18px;
-  border-top: 1px solid var(--stroke);
-  padding-top: 16px;
+.btn:hover{
+  border-color: rgba(0, 48, 184, 0.35);
 }
 
-.meta{
+.details{
+  margin-top: 12px;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+  display: none;
+}
+.details.open{ display: block; }
+
+.post{
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 12px 12px 10px;
   margin-top: 10px;
+}
+.post-title{
+  margin: 0;
+  font-weight: 700;
+}
+.post-meta{
+  margin-top: 4px;
   color: var(--muted);
   font-size: 13px;
+}
+.post-body{
+  margin-top: 8px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.post-media{
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+}
+.post-media img, .post-media video{
+  display: block;
+  width: 100%;
 }
 
 .footer{
-  border-top:1px solid var(--stroke);
-  padding: 16px 18px 28px;
+  padding: 18px 0 28px;
   color: var(--muted);
   font-size: 13px;
 }

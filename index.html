@@ -1,45 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Reddit Briefing (Last 24h)</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Reddit Briefing</title>
+    <link rel="stylesheet" href="styles.css"/>
   </head>
-
   <body>
     <header class="hero">
-      <div class="hero__inner">
-        <h1>Daily Reddit briefing</h1>
-        <p class="hero__subtitle">
-          A concise, human-readable summary of what mattered across your chosen subreddits in the last ~24 hours.
-        </p>
-        <div id="status" class="status">Loading…</div>
+      <div class="hero-inner">
+        <h1 class="brand">Reddit Briefing</h1>
+        <p class="tagline">Top stories by subreddit. Concise summaries. Minimal scrolling.</p>
+        <div id="status" class="status" aria-live="polite">Loading…</div>
       </div>
     </header>
 
-    <main class="layout">
-      <section>
-        <h2>Briefings by subreddit</h2>
-        <div id="briefings" class="cards"></div>
+    <main id="main" class="container">
+      <section class="summary-note">
+        <p>
+          This is a reader-style digest generated from the top posts over the last 24 hours.
+          It is meant to be read as a briefing: a few short paragraphs per subreddit, followed by optional detail.
+        </p>
       </section>
 
-      <section class="panel">
-        <h2>Notes</h2>
-        <p>
-          This is a summarised view; the app generates an extractive recap from the post titles and bodies you’ve fetched
-          (no external AI API required).
-        </p>
-        <div id="meta" class="meta"></div>
-      </section>
+      <section class="subs" id="subs"></section>
     </main>
 
-    <footer class="footer">
-      <p>
-        Built for GitHub Pages deployment. Content compiled from <code>data/digest.json</code> and <code>subreddits.json</code>.
-      </p>
+    <footer class="footer container">
+      <div class="foot-inner">
+        <div id="footerMeta"></div>
+      </div>
     </footer>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
