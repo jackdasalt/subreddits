@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "subreddits.json"
 OUTPUT_PATH = ROOT / "data" / "digest.json"
 USER_AGENT = "reddit-briefing-github-pages/3.0 (read-only public digest)"
