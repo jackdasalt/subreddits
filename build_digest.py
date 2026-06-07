@@ -98,7 +98,8 @@ def reddit_rss_endpoints(subreddit: str, sort: str) -> list[str]:
 
 
 def clean_text(value: Any) -> str:
-   text = html.unescape(str(value or ""))   return text.strip()(str(value or "")).
+    s = html.unescape(str(value or ""))
+    return s.strip()
 
 
 def safe_url(value: Any) -> str:
